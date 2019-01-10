@@ -11,6 +11,22 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.wpi.first.wpilibj.XboxController;
+
+//import edu.wpi.first.wpilibj.Joystick;
+
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+
+import edu.wpi.first.wpilibj.Timer;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
+import edu.wpi.first.wpilibj.Compressor;
+
+import edu.wpi.first.wpilibj.Solenoid;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -24,6 +40,25 @@ public class Robot extends IterativeRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  XboxController xbox;
+
+WPI_TalonSRX RRearWheel; // Defining all eight motors
+WPI_TalonSRX RFrontWheel;
+WPI_TalonSRX LRearWheel;
+WPI_TalonSRX LFrontWheel;
+
+Compressor Cramp;
+
+Solenoid Valve1;
+
+SpeedControllerGroup left; // Defining controllers of certain sides of motors
+SpeedControllerGroup right;
+
+DifferentialDrive roboDrive; // Defines a drive that controls both speed controllers
+
+
+
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -33,6 +68,19 @@ public class Robot extends IterativeRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    xbox = new XboxController(3);
+
+    RRearWheel = new WPI_TalonSRX(6); // right rear wheel
+    RFrontWheel = new WPI_TalonSRX(0); // right front wheel
+    LRearWheel = new WPI_TalonSRX(3); // left rear wheel
+    LFrontWheel = new WPI_TalonSRX(2); // left front wheel
+
+    Valve1 = new Solenoid(20, 0);
+
+    right = new SpeedControllerGroup(RRearWheel, RFrontWheel); // right speed controller group 
+    left = new SpeedControllerGroup(LRearWheel, LFrontWheel); // left speed controller group 
+    roboDrive = new DifferentialDrive(left, right); // making both speed controllers part of the overall drive
   }
 
   /**
@@ -87,6 +135,13 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void teleopPeriodic() {
+    roboDrive.tankDrive(xbox.getRawAxis(1), xbox.getRawAxis(5));
+
+    if (xbox.getRawButton(1)) {
+      Valve1.set(true);
+    } else {
+      Valve1.set(false);
+    }
   }
 
   /**
