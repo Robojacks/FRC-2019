@@ -35,29 +35,22 @@ import edu.wpi.first.wpilibj.Solenoid;
  * project.
  */
 public class Robot extends IterativeRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   XboxController xbox;
 
-WPI_TalonSRX RRearWheel; // Defining all eight motors
-WPI_TalonSRX RFrontWheel;
-WPI_TalonSRX LRearWheel;
-WPI_TalonSRX LFrontWheel;
+  WPI_TalonSRX RRearWheel; // Defining all eight motors
+  WPI_TalonSRX RFrontWheel;
+  WPI_TalonSRX LRearWheel;
+  WPI_TalonSRX LFrontWheel;
 
-Compressor Cramp;
+  Compressor Cramp;
 
-Solenoid Valve1;
+  Solenoid Valve1;
 
-SpeedControllerGroup left; // Defining controllers of certain sides of motors
-SpeedControllerGroup right;
+  SpeedControllerGroup left; // Defining controllers of certain sides of motors
+  SpeedControllerGroup right;
 
-DifferentialDrive roboDrive; // Defines a drive that controls both speed controllers
-
-
-
+  DifferentialDrive roboDrive; // Defines a drive that controls both speed controllers
 
   /**
    * This function is run when the robot is first started up and should be
@@ -65,9 +58,6 @@ DifferentialDrive roboDrive; // Defines a drive that controls both speed control
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
 
     xbox = new XboxController(3);
 
@@ -76,11 +66,12 @@ DifferentialDrive roboDrive; // Defines a drive that controls both speed control
     LRearWheel = new WPI_TalonSRX(3); // left rear wheel
     LFrontWheel = new WPI_TalonSRX(2); // left front wheel
 
-    Valve1 = new Solenoid(20, 0);
-
     right = new SpeedControllerGroup(RRearWheel, RFrontWheel); // right speed controller group 
     left = new SpeedControllerGroup(LRearWheel, LFrontWheel); // left speed controller group 
     roboDrive = new DifferentialDrive(left, right); // making both speed controllers part of the overall drive
+
+    roboDrive.tankDrive(0, 0);
+
   }
 
   /**
@@ -108,10 +99,7 @@ DifferentialDrive roboDrive; // Defines a drive that controls both speed control
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // autoSelected = SmartDashboard.getString("Auto Selector",
-    // defaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+  
   }
 
   /**
@@ -119,16 +107,9 @@ DifferentialDrive roboDrive; // Defines a drive that controls both speed control
    */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+    
   }
+  
 
   /**
    * This function is called periodically during operator control.
@@ -137,11 +118,6 @@ DifferentialDrive roboDrive; // Defines a drive that controls both speed control
   public void teleopPeriodic() {
     roboDrive.tankDrive(xbox.getRawAxis(1), xbox.getRawAxis(5));
 
-    if (xbox.getRawButton(1)) {
-      Valve1.set(true);
-    } else {
-      Valve1.set(false);
-    }
   }
 
   /**
